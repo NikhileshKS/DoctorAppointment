@@ -8,6 +8,21 @@ import cors from 'cors'
 const app = express()
 const port = process.env.PORT || 4000
 
+// Connect to MongoDB and start server
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(port, () => {
+            console.log(`Server started at port ${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
+
 // middlewares
 app.use(express.json())
 app.use(cors())
