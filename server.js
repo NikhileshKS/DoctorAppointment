@@ -3,6 +3,10 @@ import cars from './cars.js'
 import 'dotenv/config'
 import connectDB from './config/mongodb.js'
 import cors from 'cors'
+import connectCloudinary from './config/cloudinary.js'
+
+// Connect to Cloudinary
+connectCloudinary();
 
 // app config
 const app = express()
