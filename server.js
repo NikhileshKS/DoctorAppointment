@@ -1,34 +1,31 @@
-import express from 'express' 
-import cars from './cars.js'
-import 'dotenv/config'
-import connectDB from './config/mongodb.js'
-import cors from 'cors'
-import connectCloudinary from './config/cloudinary.js'
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config';
+import connectDB from './config/mongodb.js';
+import connectCloudinary from './config/cloudinary.js';
+import adminRouter from './Routes/adminRoute.js';
 
-// Connect to Cloudinary
-connectCloudinary();
+const app = express();
+const PORT = process.env.PORT || 4000;
 
-// app config
-const app = express()
-const port = process.env.PORT || 4000
+// connect DB
+connectDB();
+connectCloudinary
 
-// middlewares
-app.use(express.json())
-app.use(cors())
+// middleware
+app.use(cors());
+app.use(express.json());
 
-// api routes
+// api endpoints
+app.use('/api/admin',adminRouter);
+// localhost:4000/api/admin/add-doctor
+
+
+// test route
 app.get('/', (req, res) => {
-    res.send('API is Working')
-})
+    res.send('API is working');
+});
 
-app.get('/cars', (req, res) => {
-    res.json(cars) 
-})
-
-// Connect to MongoDB and start server
-connectDB().then(() => {
-    app.listen(port, () => console.log(`Server started at port ${port}`))
-}).catch(err => {
-    console.error('Failed to connect to database:', err);
-    process.exit(1);
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
