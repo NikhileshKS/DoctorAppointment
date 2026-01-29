@@ -10,16 +10,20 @@ const PORT = process.env.PORT || 4000;
 
 // connect DB
 connectDB();
-connectCloudinary
+connectCloudinary();
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
-// api endpoints
-app.use('/api/admin',adminRouter);
-// localhost:4000/api/admin/add-doctor
+// 🔍 DEBUG LOGGER — ADD IT HERE
+app.use((req, res, next) => {
+    console.log("HIT:", req.method, req.url);
+    next();
+});
 
+// routes
+app.use('/api/admin', adminRouter);
 
 // test route
 app.get('/', (req, res) => {

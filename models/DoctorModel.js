@@ -5,59 +5,83 @@ const DoctorSchema = new mongoose.Schema(
     name: {
         type: String,
         required: true,
+        trim: true,
     },
+
     email: {
         type: String,
         required: true,
         unique: true,
-    },
+        lowercase: true,
+        trim: true,
+        },
+
     password: {
         type: String,
         required: true,
     },
+
     image: {
-        type: String,
+      type: String, // image path or Cloudinary URL
         required: true,
     },
+
     specialization: {
         type: String,
         required: true,
+        trim: true,
     },
+
     degree: {
         type: String,
         required: true,
+        trim: true,
     },
+
     experience: {
         type: Number,
         required: true,
+        min: 0,
     },
+
     about: {
         type: String,
         required: true,
     },
+
     available: {
         type: Boolean,
-        required: true,
+        default: true,
     },
+
     fees: {
         type: Number,
         required: true,
+        min: 0,
     },
+
     address: {
-        type: Object,
+        type: String,
         required: true,
     },
+
     date: {
-        type: Number,
-        required: true,
+        type: Date,
+        default: Date.now,
     },
+
     slots_blocked: {
         type: Object,
         default: {},
     },
 },
-{ minimize: false }
+    {
+    timestamps: true,
+    minimize: false,
+    }
 );
 
-const Doctor = mongoose.models.Doctor || mongoose.model("Doctor", DoctorSchema);
+const Doctor =
+    mongoose.models.Doctor || mongoose.model("Doctor", DoctorSchema);
+
 export default Doctor;
