@@ -1,15 +1,18 @@
 import express from "express";
-import { addDoctor } from "../controllers/adminController.js";
+import { addDoctor, adminLogin } from "../controllers/adminController.js";
 import upload from "../middlewares/multer.js";
+import authAdmin from "../middlewares/authAdmin.js";
 
 const adminRouter = express.Router();
 
-// Route with file upload middleware
+// admin login 
+adminRouter.post("/login", adminLogin);
+
+// protected route
 adminRouter.post(
-    "/add-doctor",
+    "/add-doctor",authAdmin,
     upload.single("image"),
     addDoctor
 );
-
 
 export default adminRouter;

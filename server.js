@@ -16,12 +16,6 @@ connectCloudinary();
 app.use(cors());
 app.use(express.json());
 
-// 🔍 DEBUG LOGGER — ADD IT HERE
-app.use((req, res, next) => {
-    console.log("HIT:", req.method, req.url);
-    next();
-});
-
 // routes
 app.use('/api/admin', adminRouter);
 
