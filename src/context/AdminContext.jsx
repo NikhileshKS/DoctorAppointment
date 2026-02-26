@@ -8,7 +8,7 @@ const AdminContextProvider = ({ children }) => {
     // FIRST declare
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-    const [aToken, setAToken] = useState('');
+    const [aToken, setAToken] = useState(localStorage.getItem("aToken")? localStorage.getItem("aToken") : '');
 
     // THEN use
     const value = {
