@@ -7,10 +7,6 @@ import doctorModel from "../models/doctorModel.js";
 // API to Add Doctor
 const addDoctor = async (req, res) => {
   try {
-    // ✅ Add these to debug
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     const {
         name,
         email,
@@ -37,8 +33,6 @@ const addDoctor = async (req, res) => {
         !fees ||
         !address
         ) {
-        // ✅ Add this to see which field is missing
-        console.log('Missing fields check:', { name, email, password, specialization, degree, experience, about, fees, address });
         return res.status(400).json({
             success: false,
             message: "Missing details",
@@ -81,10 +75,14 @@ const addDoctor = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+    
+
         // 6️⃣ Upload image to Cloudinary
         const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
         resource_type: "image",
         });
+
+
 
         // 7️⃣ Create doctor object
         const doctorData = {
@@ -98,7 +96,7 @@ const addDoctor = async (req, res) => {
         fees,
         address,
         image: imageUpload.secure_url,
-        date: Date.now()
+        date:Date.now()
         };
 
         // 8️⃣ Save to DB
@@ -124,12 +122,15 @@ const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Check credentials
         if (
         email === process.env.ADMIN_EMAIL &&
         password === process.env.ADMIN_PASSWORD
         ) {
+        // Create Token (FIXED)
         const token = jwt.sign(email+password, process.env.JWT_SECRET);
 
+        // SUCCESS RESPONSE (FIXED)
         return res.json({
             success: true,
             message: "Admin logged in successfully",
@@ -137,6 +138,7 @@ const adminLogin = async (req, res) => {
         });
         }
 
+        // Invalid credentials (MOVED OUTSIDE IF)
         return res.status(401).json({
         success: false,
         message: "Invalid credentials",
