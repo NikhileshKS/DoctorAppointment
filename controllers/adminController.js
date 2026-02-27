@@ -6,7 +6,7 @@ import doctorModel from "../models/doctorModel.js";
 
 // API to Add Doctor
 const addDoctor = async (req, res) => {
-  try {
+    try {
     // ✅ Add these to debug
     console.log('req.body:', req.body);
     console.log('req.file:', req.file);
