@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { assets } from "../../assets/assets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { AdminContext } from "../../context/AdminContext";
 import { toast } from "react-toastify";
 import axios from "axios";  
@@ -19,6 +19,7 @@ const AddDoctor = () => {
     const [address1, setAddress1] = React.useState('');
     const [address2, setAddress2] = React.useState('');
     const [about, setAbout] = React.useState('');
+    const [showPassword, setShowPassword] = useState(false); // 👁️ new
 
     const { backendUrl, aToken } = useContext(AdminContext);
 
@@ -42,7 +43,6 @@ const AddDoctor = () => {
             formData.append('address', JSON.stringify({ line1: address1, line2: address2 }));
             formData.append('about', about);
 
-            // ✅ Fixed — lowercase atoken as header key
             const { data } = await axios.post(backendUrl + '/api/admin/add-doctor', formData, {
                 headers: { atoken: aToken }
             });
@@ -115,17 +115,26 @@ const AddDoctor = () => {
                                     className="border rounded p-2" 
                                 />
                             </div>
+
                             <div className="flex flex-col gap-1">
                                 <p>Password</p>
-                                <input 
-                                    type="password" 
-                                    placeholder="Password" 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required 
-                                    className="border rounded p-2" 
-                                />
+                                <div className="border rounded p-2 flex items-center">
+                                    <input 
+                                        type={showPassword ? "text" : "password"} 
+                                        placeholder="Password" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required 
+                                        className="outline-none w-full" 
+                                    />
+                                    <FontAwesomeIcon 
+                                        icon={showPassword ? faEyeSlash : faEye} 
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="cursor-pointer text-gray-400 hover:text-gray-600"
+                                    />
+                                </div>
                             </div>
+
                             <div className="flex flex-col gap-1">
                                 <p>Experience</p>
                                 <select 
