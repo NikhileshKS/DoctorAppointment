@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { assets } from "../../assets/assets";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@ const AddDoctor = () => {
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [showPassword, setShowPassword] = React.useState(false); 
     const [experience, setExperience] = React.useState('1 Year');
     const [fees, setFees] = React.useState('');
     const [speciality, setSpeciality] = React.useState('General Physician');
@@ -19,7 +20,6 @@ const AddDoctor = () => {
     const [address1, setAddress1] = React.useState('');
     const [address2, setAddress2] = React.useState('');
     const [about, setAbout] = React.useState('');
-    const [showPassword, setShowPassword] = useState(false); // 👁️ new
 
     const { backendUrl, aToken } = useContext(AdminContext);
 
@@ -64,7 +64,7 @@ const AddDoctor = () => {
 
         } catch (error) {
             console.error(error);
-            toast.error(error.message);
+            toast.error(error.response?.data?.message || error.message);
         }
     };
 
@@ -118,19 +118,19 @@ const AddDoctor = () => {
 
                             <div className="flex flex-col gap-1">
                                 <p>Password</p>
-                                <div className="border rounded p-2 flex items-center">
+                                <div className="border rounded p-2 flex items-center gap-2">
                                     <input 
-                                        type={showPassword ? "text" : "password"} 
+                                        type={showPassword ? "text" : "password"}
                                         placeholder="Password" 
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required 
-                                        className="outline-none w-full" 
+                                        className="flex-1 outline-none"
                                     />
                                     <FontAwesomeIcon 
                                         icon={showPassword ? faEyeSlash : faEye} 
-                                        onClick={() => setShowPassword(!showPassword)}
                                         className="cursor-pointer text-gray-400 hover:text-gray-600"
+                                        onClick={() => setShowPassword(!showPassword)}
                                     />
                                 </div>
                             </div>
