@@ -101,4 +101,15 @@ const adminLogin = async (req, res) => {
     }
 };
 
-export { addDoctor, adminLogin };
+// Api to get all doctors list for admin
+const allDoctors = async (req, res) => {
+
+    try {
+        const doctors = await doctorModel.find({}).select("-password");
+        return res.json({ success: true, message: "Doctors fetched successfully", doctors });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "allDoctors Error" });
+    }
+}
+export { addDoctor, adminLogin ,allDoctors};
