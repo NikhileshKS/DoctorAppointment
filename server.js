@@ -4,7 +4,7 @@ import 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './Routes/adminRoute.js';
-import doctorRouter from './Routes/doctorRoute.js'; // 👈 Add this
+import doctorRouter from './Routes/doctorRoute.js'; 
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -19,7 +19,7 @@ app.use(express.json());
 
 // routes
 app.use('/api/admin', adminRouter);
-app.use('/api/doctor', doctorRouter); // 👈 Add this
+app.use('/api/doctor', doctorRouter); 
 
 // test route
 app.get('/', (req, res) => {
