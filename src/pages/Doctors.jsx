@@ -15,7 +15,7 @@ const Doctor = () => {
 
   const applyFilter = () => {
     if (speciality) {
-      setFilterDoc(doctors.filter(doc => doc.speciality === speciality))
+      setFilterDoc(doctors.filter(doc => doc.specialization === speciality))
     } else {
       setFilterDoc(doctors)
     }
@@ -27,7 +27,7 @@ const Doctor = () => {
 
   // Specialities array to avoid repetition
   const specialities = [
-    'General physician',
+    'General Physician',
     'Gynecologist',
     'Dermatologist',
     'Pediatricians',
@@ -83,11 +83,13 @@ const Doctor = () => {
                 />
                 <div className='p-4'>
                   <div className='flex items-center mb-2'>
-                    <span className='w-2 h-2 bg-green-600 rounded-full mr-2'></span>
-                    <p className='text-green-600 text-sm'>Available</p>
+                    <span className={`w-2 h-2 rounded-full mr-2 ${item.available ? 'bg-green-600' : 'bg-red-400'}`}></span>
+                    <p className={`text-sm ${item.available ? 'text-green-600' : 'text-red-400'}`}>
+                      {item.available ? 'Available' : 'Not Available'}
+                    </p>
                   </div>
                   <p className='text-gray-900 text-lg font-medium'>{item.name}</p>
-                  <p className='text-gray-600 text-sm'>{item.speciality}</p>
+                  <p className='text-gray-600 text-sm'>{item.specialization}</p>
                 </div>
               </div>
             ))
