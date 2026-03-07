@@ -124,7 +124,7 @@ const Navbar = () => {
               <img 
                 onClick={() => setShowMenu(false)} 
                 className='w-6 cursor-pointer' 
-                src={assets.close_icon} 
+                src={assets.cross_icon} 
                 alt="" 
               />
             </div>
