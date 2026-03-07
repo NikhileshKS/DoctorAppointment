@@ -11,7 +11,14 @@ const MyAppointments = () => {
         My Appointments
       </p>
       <div>
-        {doctors.slice(0, 3).map((item, index) => (
+        {doctors.slice(0, 3).map((item, index) => {
+          // address is stored as a JSON string in DB, parse it safely
+          let addr = { line1: '', line2: '' };
+          try {
+            addr = typeof item.address === 'string' ? JSON.parse(item.address) : item.address || addr;
+          } catch (_) {}
+
+          return (
           <div
             key={index}
             className="grid grid-cols-[1fr_2fr] sm:flex sm:gap-6 gap-4 py-4 border-b items-center bg-white rounded-lg shadow-sm hover:shadow-md transition"
@@ -21,19 +28,19 @@ const MyAppointments = () => {
               <img
                 className="w-32 h-32 object-cover rounded-md bg-indigo-50"
                 src={item.image}
-                alt={`Dr. ${item.name}, ${item.specialty}`}
+                alt={`Dr. ${item.name}, ${item.specialization}`}
               />
             </div>
 
             {/* Doctor Info */}
             <div className="flex-1 space-y-1">
               <p className="text-indigo-700 font-semibold text-lg">{item.name}</p>
-              <p className="text-gray-600">{item.specialty}</p>
+              <p className="text-gray-600">{item.specialization}</p>
               <p className="text-sm text-gray-500 font-medium">Address:</p>
-              <p className="text-sm text-gray-700">{item.address.line1}</p>
-              <p className="text-sm text-gray-700">{item.address.line2}</p>
+              <p className="text-sm text-gray-700">{addr.line1}</p>
+              <p className="text-sm text-gray-700">{addr.line2}</p>
               <p className="text-sm mt-2">
-                <span className="font-semibold text-gray-700">Date & time:</span>{" "}
+                <span className="font-semibold text-gray-700">Date &amp; time:</span>{" "}
                 25 Sept 2025 | 8:30 AM
               </p>
             </div>
@@ -48,7 +55,8 @@ const MyAppointments = () => {
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   )
