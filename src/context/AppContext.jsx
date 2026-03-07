@@ -30,6 +30,7 @@ const AppContextProvider = ({ children }) => {
         doctors,
         backendURL,      
         getDoctorsData,
+        currencySymbol: '₹',
     };
 
     return (
