@@ -11,6 +11,7 @@ const Appointment = () => {
   const daysofWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
   const [docInfo, setDocInfo] = useState(null);
+  const [docAddress, setDocAddress] = useState({ line1: '', line2: '' });
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState('');
@@ -20,11 +21,16 @@ const Appointment = () => {
       const docInfo = doctors.find(doc => doc._id === docId);
       if (docInfo) {
         setDocInfo(docInfo);
-      } else {
-        console.error(`Doctor with ID ${docId} not found`);
+        // address is stored as a JSON string in DB — parse it safely
+        try {
+          const addr = typeof docInfo.address === 'string'
+            ? JSON.parse(docInfo.address)
+            : docInfo.address || { line1: '', line2: '' };
+          setDocAddress(addr);
+        } catch (_) {
+          setDocAddress({ line1: docInfo.address || '', line2: '' });
+        }
       }
-    } else {
-      console.error("Doctors array is empty or undefined");
     }
   };
 
@@ -56,7 +62,6 @@ const Appointment = () => {
           datetime: new Date(currentDate),
           time: formattedTime,
         });
-
         currentDate.setMinutes(currentDate.getMinutes() + 30);
       }
 
@@ -98,9 +103,9 @@ const Appointment = () => {
           </p>
           <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
             <p>
-              {docInfo.degree} - {docInfo.speciality}
+              {docInfo.degree} - {docInfo.specialization}
             </p>
-            <button className="py-0.5 px-2 border text-xs rounded-full">{docInfo.experience}</button>
+            <button className="py-0.5 px-2 border text-xs rounded-full">{docInfo.experience} Years</button>
           </div>
           <div>
             <p className="flex items-center gap-1 text-sm font-medium text-gray-900 mt-3">
@@ -111,44 +116,53 @@ const Appointment = () => {
           <p className="text-gray-500 font-medium mt-4">
             Appointment fee: <span className="text-gray-600">{currencySymbol}{docInfo.fees}</span>
           </p>
+          <div className="text-sm text-gray-600 mt-2">
+            <p>{docAddress.line1}</p>
+            {docAddress.line2 && <p>{docAddress.line2}</p>}
+          </div>
         </div>
       </div>
 
       {/* Booking Slot */}
       <div className='sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700'>
-      <p>Booking slots</p>
-      <div className='flex gap-3 items-center w-full overflow-x-scroll mt-4'>
-        {docSlots?.map((item, index) => (
-          item[0] && (
-            <div
-              className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${slotIndex === index ? 'bg-primary text-white' : 'border border-gray-600'}`}
-              key={item[0].id || index} // Assuming item[0] has a unique 'id' property
-              onClick={() => setSlotIndex(index)}
-            >
-              <p>{daysofWeek[item[0].datetime.getDay()]}</p>
-              <p>{item[0].datetime.getDate()}</p>
-            </div>
-          )
-        ))}
-      </div>
+        <p>Booking slots</p>
+        <div className='flex gap-3 items-center w-full overflow-x-scroll mt-4'>
+          {docSlots?.map((item, index) => (
+            item[0] && (
+              <div
+                className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${slotIndex === index ? 'bg-primary text-white' : 'border border-gray-600'}`}
+                key={item[0].id || index}
+                onClick={() => setSlotIndex(index)}
+              >
+                <p>{daysofWeek[item[0].datetime.getDay()]}</p>
+                <p>{item[0].datetime.getDate()}</p>
+              </div>
+            )
+          ))}
+        </div>
 
-      <div className='flex items-center gap-3 w-full overflow-x-scroll mt-4 '>
-        {docSlots.length && docSlots[slotIndex].map((item,index)=>(
-          <p onClick={()=>setSlotTime(item.time)} className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-gray-400 border border-gray-800'}`} key={index}>
-          {item.time.toLowerCase()}
-        </p>        
-        ))}
-      </div>
-      <div>
-        <button className="relative bg-primary text-white w-56 h-12 border border-[#3654ff] rounded-lg text-center transition-all duration-600 ease-in-out hover:bg-blue-900 cursor-pointer mt-8">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ease-in-out hover:translate-x-1.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-          </svg>
-          <div className="ml-8 ">Book an Appointment</div>
-        </button>
+        <div className='flex items-center gap-3 w-full overflow-x-scroll mt-4'>
+          {docSlots.length && docSlots[slotIndex].map((item, index) => (
+            <p
+              onClick={() => setSlotTime(item.time)}
+              className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-gray-400 border border-gray-800'}`}
+              key={index}
+            >
+              {item.time.toLowerCase()}
+            </p>
+          ))}
+        </div>
+
+        <div>
+          <button className="relative bg-primary text-white w-56 h-12 border border-[#3654ff] rounded-lg text-center transition-all duration-600 ease-in-out hover:bg-blue-900 cursor-pointer mt-8">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2 transition-all duration-600 ease-in-out hover:translate-x-1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+            </svg>
+            <div className="ml-8">Book an Appointment</div>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   );
 };
 
