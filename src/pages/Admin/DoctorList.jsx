@@ -30,7 +30,7 @@ const DoctorList = () => {
                                 {item.name}
                             </p>
                             <p className="text-sm text-indigo-500 font-medium mb-2 truncate">
-                                {item.speciality}
+                                {item.specialization}
                             </p>
 
                             <div className="flex items-center gap-2 text-sm">
