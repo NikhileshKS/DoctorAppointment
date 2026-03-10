@@ -5,6 +5,7 @@ import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import adminRouter from './Routes/adminRoute.js';
 import doctorRouter from './Routes/doctorRoute.js'; 
+import userRouter from './Routes/userRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -20,6 +21,7 @@ app.use(express.json());
 // routes
 app.use('/api/admin', adminRouter);
 app.use('/api/doctor', doctorRouter); 
+app.use('/api/user', userRouter);
 
 // test route
 app.get('/', (req, res) => {
