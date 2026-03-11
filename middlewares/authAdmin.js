@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 // admin authentication middleware
 const authAdmin = (req, res, next) => {
     try {
-        // ✅ Fixed — lowercase atoken to match frontend header key
         const { atoken } = req.headers;
 
         if (!atoken) {
