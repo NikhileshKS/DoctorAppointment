@@ -3,6 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
+import {v2 as cloudinary} from 'cloudinary';
 
 // API for user registration
 const registerUser =async (req, res) => {
@@ -75,7 +76,7 @@ const loginUser = async (req, res) => {
 
         // ✅ Password is correct → generate token and allow access
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        return res.status(200).json({ success: true, message: 'Login successful✅', token });
+        return res.status(200).json({ success: true, message: 'Login successful', token });
 
     } catch (error) {
         console.error('Login Error:', error);
@@ -102,4 +103,39 @@ const getProfile = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, getProfile };
+// API to update user profile data
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.userId; 
+        const { name, phone, address, dob, gender } = req.body;
+        const imageFile = req.file;
+
+        if (!name || !phone || !dob || !gender) {
+            return res.status(400).json({ success: false, message: 'Missing required details' });
+        }
+
+        await userModel.findByIdAndUpdate(userId, {
+            name,
+            phone,
+            address: JSON.parse(address),
+            dob,
+            gender
+        });
+
+        if (imageFile) {
+            // ✅ upload image to cloudinary
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+                resource_type: 'image'
+            });
+            const imageUrl = imageUpload.secure_url;
+            await userModel.findByIdAndUpdate(userId, { image: imageUrl });
+        }
+
+        return res.status(200).json({ success: true, message: "Profile updated successfully" });
+
+    } catch (error) {
+        console.error("Update Profile Error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Failed to update profile" });
+    }
+};
+export { registerUser, loginUser, getProfile , updateProfile };
