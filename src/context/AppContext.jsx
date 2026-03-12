@@ -8,11 +8,10 @@ export const AppContext = createContext();
 const AppContextProvider = ({ children }) => {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
     const [doctors, setDoctors] = useState([]);
-    const [token, setToken] = useState(
-        localStorage.getItem('token') || null
-    );
+    const [token, setToken] = useState(localStorage.getItem('token') || null);
     const [userData, setUserData] = useState(null);
     const isLoggingOut = useRef(false);
+
     const saveToken = (newToken) => {
         setToken(newToken);
         if (newToken) {
@@ -26,7 +25,7 @@ const AppContextProvider = ({ children }) => {
     const loadUserData = useCallback(async (currentToken) => {
         try {
             const { data } = await axios.get(`${backendURL}/api/user/profile`, {
-                headers: { Authorization: `Bearer ${currentToken}` }
+                headers: { token: currentToken } 
             });
             if (data.success) {
                 setUserData(data.user);
