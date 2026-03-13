@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContext' // Ensure AppContext is correctly imported
+import { AppContext } from '../context/AppContext' 
 
 const Doctor = () => {
-  const { speciality } = useParams() // Extracting the speciality from the URL params
-  const { doctors } = useContext(AppContext) // Getting doctors from context
+  const { speciality } = useParams() 
+  const { doctors } = useContext(AppContext) 
   const navigate = useNavigate()
   const [filterDoc, setFilterDoc] = useState([])
 
