@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import {v2 as cloudinary} from 'cloudinary';
+import doctorModel from '../models/DoctorModel.js';       
+import appointmentModel from '../models/appointmentModel.js';
 
 // API for user registration
 const registerUser =async (req, res) => {
@@ -138,4 +140,63 @@ const updateProfile = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message || "Failed to update profile" });
     }
 };
-export { registerUser, loginUser, getProfile , updateProfile };
+
+// API for booking appointment
+const bookAppointment = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { docId, slotDate, slotTime } = req.body;
+
+        const docDate = await doctorModel.findById(docId).select('-password');
+
+        if (!docDate) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        if (!docDate.available) {
+            return res.status(400).json({ success: false, message: "Doctor is not available" });
+        }
+
+        // ✅ fallback to {} if slots_blocked is undefined
+        let slots_booked = docDate.slots_blocked || {};
+
+        if (slots_booked[slotDate]) {
+            if (slots_booked[slotDate].includes(slotTime)) {
+                return res.status(400).json({ success: false, message: "Slot already booked. Please choose another." });
+            } else {
+                slots_booked[slotDate].push(slotTime);
+            }
+        } else {
+            slots_booked[slotDate] = [];
+            slots_booked[slotDate].push(slotTime);
+        }
+
+        const userData = await userModel.findById(userId).select('-password');
+        const docData = docDate.toObject();
+        delete docData.slots_blocked;
+
+        const appointmentData = {
+            userId,
+            docId,
+            userDate: userData,
+            docDate: docData,
+            amount: docData.fees,
+            slotDate,
+            slotTime,
+            date: Date.now(),
+            payment: false,
+        };
+
+        const newAppointment = new appointmentModel(appointmentData);
+        await newAppointment.save();
+
+        await doctorModel.findByIdAndUpdate(docId, { slots_blocked: slots_booked });
+
+        return res.status(201).json({ success: true, message: "Appointment booked successfully" });
+
+    } catch (error) {
+        console.error("Book Appointment Error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Failed to book appointment" });
+    }
+};
+export { registerUser, loginUser, getProfile , updateProfile, bookAppointment};
