@@ -59,6 +59,7 @@ const AppContextProvider = ({ children }) => {
 
     useEffect(() => {
         getDoctorsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
