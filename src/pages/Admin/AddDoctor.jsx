@@ -101,7 +101,7 @@ const AddDoctor = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required 
-                                    className="border rounded p-2" 
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
@@ -112,20 +112,20 @@ const AddDoctor = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required 
-                                    className="border rounded p-2" 
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                             </div>
 
                             <div className="flex flex-col gap-1">
                                 <p>Password</p>
-                                <div className="border rounded p-2 flex items-center gap-2">
+                                <div className="border rounded p-2 flex items-center gap-2 bg-white focus-within:border-blue-400">
                                     <input 
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Password" 
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required 
-                                        className="flex-1 outline-none"
+                                        className="flex-1 outline-none bg-white text-gray-700"
                                     />
                                     <FontAwesomeIcon 
                                         icon={showPassword ? faEyeSlash : faEye} 
@@ -142,7 +142,7 @@ const AddDoctor = () => {
                                     id="experience" 
                                     value={experience}
                                     onChange={(e) => setExperience(e.target.value)}
-                                    className="border rounded p-2"
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400"
                                 >
                                     <option value="1 Year">1 year</option>
                                     <option value="2 Year">2 year</option>
@@ -164,7 +164,7 @@ const AddDoctor = () => {
                                     value={fees}
                                     onChange={(e) => setFees(e.target.value)}
                                     required 
-                                    className="border rounded p-2" 
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                             </div>
                         </div>
@@ -178,7 +178,7 @@ const AddDoctor = () => {
                                     id="speciality" 
                                     value={speciality}
                                     onChange={(e) => setSpeciality(e.target.value)}
-                                    className="border rounded p-2"
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400"
                                 >
                                     <option value="General Physician">General Physician</option>
                                     <option value="Gynecologist">Gynecologist</option>
@@ -196,7 +196,7 @@ const AddDoctor = () => {
                                     value={degree}
                                     onChange={(e) => setDegree(e.target.value)}
                                     required 
-                                    className="border rounded p-2" 
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
@@ -207,7 +207,7 @@ const AddDoctor = () => {
                                     value={address1}
                                     onChange={(e) => setAddress1(e.target.value)}
                                     required 
-                                    className="border rounded p-2 mb-2" 
+                                    className="border rounded p-2 mb-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                                 <input 
                                     type="text" 
@@ -215,7 +215,7 @@ const AddDoctor = () => {
                                     value={address2}
                                     onChange={(e) => setAddress2(e.target.value)}
                                     required 
-                                    className="border rounded p-2" 
+                                    className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400" 
                                 />
                             </div>
                         </div>
@@ -230,7 +230,7 @@ const AddDoctor = () => {
                             onChange={(e) => setAbout(e.target.value)}
                             rows={5} 
                             required 
-                            className="border rounded p-2"
+                            className="border rounded p-2 bg-white text-gray-700 outline-none focus:border-blue-400"
                         ></textarea>
                     </div>
 
