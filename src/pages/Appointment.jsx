@@ -194,7 +194,6 @@ const Appointment = () => {
                         : <p className="text-sm text-red-400">No slots available for this day</p> 
                     }
                 </div>
-
                 <div>
                     <button
                         onClick={bookAppointment}
