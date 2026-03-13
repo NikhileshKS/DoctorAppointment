@@ -1,4 +1,4 @@
-import doctorModel from "../models/doctorModel.js";
+import doctorModel from "../models/DoctorModel.js";
 
 const changeAvaliabity = async (req, res) => {
     try {
