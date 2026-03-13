@@ -8,7 +8,7 @@ import { AppContext } from '../context/AppContext'
 const Doctor = () => {
   const { speciality } = useParams()
   const { doctors } = useContext(AppContext) 
-  const [showFilter, setShowFilter] = useState(false) // Fixed variable name
+  const [showFilter, setShowFilter] = useState(false) 
 
   const navigate = useNavigate()
   const [filterDoc, setFilterDoc] = useState([])
