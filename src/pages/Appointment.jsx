@@ -9,7 +9,8 @@ import { toast } from 'react-toastify';
 const Appointment = () => {
     const { docId } = useParams();
     const navigate = useNavigate();
-    const { doctors, currencySymbol, token, backendURL } = useContext(AppContext);
+    
+    const { doctors, currencySymbol, token, backendURL, getDoctorsData } = useContext(AppContext);
     const daysofWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
     const [docInfo, setDocInfo] = useState(null);
@@ -40,7 +41,6 @@ const Appointment = () => {
         const slots = [];
         const today = new Date();
 
-        // ✅ get booked slots
         const bookedSlots = docInfo.slots_blocked || {};
 
         for (let i = 0; i < 7; i++) {
@@ -67,10 +67,7 @@ const Appointment = () => {
                     minute: '2-digit'
                 });
 
-                // ✅ build same slotDate format as backend
                 const slotDate = `${currentDate.getDate()}_${currentDate.getMonth() + 1}_${currentDate.getFullYear()}`;
-
-                // ✅ skip already booked slots
                 const isBooked = bookedSlots[slotDate]?.includes(formattedTime);
 
                 if (!isBooked) {
@@ -111,6 +108,7 @@ const Appointment = () => {
 
             if (data.success) {
                 toast.success(data.message);
+                await getDoctorsData(); 
                 navigate('/my-appointments');
             } else {
                 toast.error(data.message);
@@ -191,9 +189,10 @@ const Appointment = () => {
                                 {item.time.toLowerCase()}
                             </p>
                         ))
-                        : <p className="text-sm text-red-400">No slots available for this day</p> 
+                        : <p className="text-sm text-red-400">No slots available for this day</p>
                     }
                 </div>
+
                 <div>
                     <button
                         onClick={bookAppointment}
