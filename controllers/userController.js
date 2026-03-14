@@ -200,4 +200,46 @@ const listAppointment = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment };
+// API to cancel appointment
+// API to cancel appointment
+const cancelAppointment = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { appointmentId } = req.body;
+
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        if (!appointment.userId || appointment.userId.toString() !== userId.toString()) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+
+        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+        const { docId, slotDate, slotTime } = appointment;
+        const doctor = await doctorModel.findById(docId);
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        let slots_blocked = doctor.slots_blocked || {};
+
+        if (slots_blocked[slotDate]) {
+            slots_blocked[slotDate] = slots_blocked[slotDate].filter(t => t !== slotTime);
+        }
+
+        await doctorModel.findByIdAndUpdate(docId, { slots_blocked });
+
+        return res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
+
+    } catch (error) {
+        console.error("Cancel Appointment Error:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment , cancelAppointment};
