@@ -160,15 +160,14 @@ const bookAppointment = async (req, res) => {
 
         const userData = await userModel.findById(userId).select('-password');
 
-        // ✅ FIX: correctly named docData (was docDate before)
         const docData = docInfo.toObject();
         delete docData.slots_blocked;
 
         const appointmentData = {
             userId,
             docId,
-            userData,       // ✅ FIX: was userDate
-            docData,        // ✅ FIX: was docDate — frontend reads item.docData
+            userData,      
+            docData,       
             amount: docData.fees,
             slotDate,
             slotTime,
