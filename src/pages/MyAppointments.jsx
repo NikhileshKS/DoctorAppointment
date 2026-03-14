@@ -15,10 +15,10 @@ const MyAppointments = () => {
     try {
       setLoading(true)
       const { data } = await axios.get(`${backendURL}/api/user/appointments`, {
-        headers: { token },  // authUser middleware reads req.headers.token
+        headers: { token },  
       })
       if (data.success) {
-        setAppointments(data.appointments.reverse().filter(a => a.docData)) // newest first
+        setAppointments(data.appointments.reverse().filter(a => a.docData)) 
       } else {
         console.error('API error:', data.message)
         toast.error(data.message || 'Failed to load appointments')
