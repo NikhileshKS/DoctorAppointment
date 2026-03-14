@@ -5,12 +5,12 @@ const appointmentSchema = new mongoose.Schema({
     docId:       { type: String, required: true },
     slotDate:    { type: String, required: true },
     slotTime:    { type: String, required: true },
-    userDate:    { type: Object, required: true },
-    docDate:     { type: Object, required: true },
+    userData:    { type: Object, required: true },  
+    docData:     { type: Object, required: true }, 
     amount:      { type: Number, required: true },
     date:        { type: Number, required: true },
     cancelled:   { type: Boolean, default: false },
-    payment:     { type: Boolean, default: false }, // ✅ default false, not required
+    payment:     { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
