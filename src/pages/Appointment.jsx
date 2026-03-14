@@ -196,9 +196,16 @@ const Appointment = () => {
                 <div>
                     <button
                         onClick={bookAppointment}
-                        className="relative bg-primary text-white w-56 h-12 border border-[#3654ff] rounded-lg text-center hover:bg-blue-900 cursor-pointer mt-8"
+                        className="group relative bg-primary text-white w-56 h-12 border border-[#3654ff] rounded-lg text-center hover:bg-blue-900 cursor-pointer mt-8"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6 absolute left-2 top-1/2 transform -translate-y-1/2 transition-transform duration-300 group-hover:translate-x-2"
+                        >
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
                         </svg>
                         <div className="ml-8">Book an Appointment</div>
