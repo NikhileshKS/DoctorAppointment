@@ -3,9 +3,32 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
-import {v2 as cloudinary} from 'cloudinary';
-import doctorModel from '../models/DoctorModel.js';       
+import { v2 as cloudinary } from 'cloudinary';
+import mongoose from 'mongoose';
+import doctorModel from '../models/DoctorModel.js';
 import appointmentModel from '../models/appointmentModel.js';
+
+const ALLOWED_ADDRESS_KEYS = ['line1', 'line2', 'city', 'state', 'pincode', 'country'];
+
+function parseAndSanitizeAddress(addressInput) {
+    if (addressInput == null) return undefined;
+    const raw = typeof addressInput === 'string' ? addressInput.trim() : String(addressInput);
+    if (!raw) return undefined;
+    let parsed;
+    try {
+        parsed = JSON.parse(raw);
+    } catch {
+        return undefined;
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return undefined;
+    const sanitized = {};
+    for (const key of ALLOWED_ADDRESS_KEYS) {
+        if (Object.prototype.hasOwnProperty.call(parsed, key) && typeof parsed[key] === 'string') {
+            sanitized[key] = parsed[key];
+        }
+    }
+    return Object.keys(sanitized).length ? sanitized : undefined;
+}
 
 // API for user registration
 const registerUser = async (req, res) => {
@@ -41,7 +64,7 @@ const registerUser = async (req, res) => {
 
     } catch (error) {
         console.error('Register Error:', error);
-        res.status(500).json({ success: false, message: error.message || 'Registration failed' });
+        res.status(500).json({ success: false, message: 'Registration failed' });
     }
 };
 
@@ -71,7 +94,7 @@ const loginUser = async (req, res) => {
 
     } catch (error) {
         console.error('Login Error:', error);
-        res.status(500).json({ success: false, message: error.message || 'Login failed' });
+        res.status(500).json({ success: false, message: 'Login failed' });
     }
 };
 
@@ -90,7 +113,7 @@ const getProfile = async (req, res) => {
 
     } catch (error) {
         console.error("Get Profile Error:", error);
-        return res.status(500).json({ success: false, message: error.message || "Failed to fetch profile" });
+        return res.status(500).json({ success: false, message: "Failed to fetch profile" });
     }
 };
 
@@ -105,10 +128,12 @@ const updateProfile = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Missing required details' });
         }
 
+        const sanitizedAddress = parseAndSanitizeAddress(address);
+
         await userModel.findByIdAndUpdate(userId, {
             name,
             phone,
-            address: JSON.parse(address),
+            ...(sanitizedAddress !== undefined && { address: sanitizedAddress }),
             dob,
             gender
         });
@@ -125,7 +150,7 @@ const updateProfile = async (req, res) => {
 
     } catch (error) {
         console.error("Update Profile Error:", error);
-        return res.status(500).json({ success: false, message: error.message || "Failed to update profile" });
+        return res.status(500).json({ success: false, message: "Failed to update profile" });
     }
 };
 
@@ -134,6 +159,13 @@ const bookAppointment = async (req, res) => {
     try {
         const userId = req.userId;
         const { docId, slotDate, slotTime } = req.body;
+
+        if (!docId || !slotDate || !slotTime) {
+            return res.status(400).json({ success: false, message: "Doctor, date and time are required" });
+        }
+        if (!mongoose.Types.ObjectId.isValid(docId)) {
+            return res.status(400).json({ success: false, message: "Invalid doctor ID" });
+        }
 
         const docInfo = await doctorModel.findById(docId).select('-password');
 
@@ -184,7 +216,7 @@ const bookAppointment = async (req, res) => {
 
     } catch (error) {
         console.error("Book Appointment Error:", error);
-        return res.status(500).json({ success: false, message: error.message || "Failed to book appointment" });
+        return res.status(500).json({ success: false, message: "Failed to book appointment" });
     }
 };
 
@@ -201,11 +233,14 @@ const listAppointment = async (req, res) => {
 };
 
 // API to cancel appointment
-// API to cancel appointment
 const cancelAppointment = async (req, res) => {
     try {
         const userId = req.userId;
         const { appointmentId } = req.body;
+
+        if (!appointmentId || !mongoose.Types.ObjectId.isValid(appointmentId)) {
+            return res.status(400).json({ success: false, message: "Invalid appointment ID" });
+        }
 
         const appointment = await appointmentModel.findById(appointmentId);
 
@@ -238,7 +273,7 @@ const cancelAppointment = async (req, res) => {
 
     } catch (error) {
         console.error("Cancel Appointment Error:", error);
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: "Failed to cancel appointment" });
     }
 };
 

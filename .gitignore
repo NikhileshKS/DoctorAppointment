@@ -1,0 +1,12 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Uploads (temp before Cloudinary)
+uploads/
+
+# Logs and dependencies
+node_modules
+logs
+*.log

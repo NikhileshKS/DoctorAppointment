@@ -84,20 +84,39 @@ const addDoctor = async (req, res) => {
 };
 
 // API For Admin Login
+// Prefer ADMIN_PASSWORD_HASH (bcrypt hash of password); fallback to ADMIN_PASSWORD for backward compatibility
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET);
-            return res.json({ success: true, message: "Admin logged in successfully", token });
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Email and password required" });
         }
 
-        return res.status(401).json({ success: false, message: "Invalid credentials" });
+        if (email !== process.env.ADMIN_EMAIL) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
 
+        let passwordValid = false;
+        if (process.env.ADMIN_PASSWORD_HASH) {
+            passwordValid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
+        } else if (process.env.ADMIN_PASSWORD) {
+            passwordValid = password === process.env.ADMIN_PASSWORD;
+        }
+
+        if (!passwordValid) {
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            { sub: process.env.ADMIN_EMAIL, role: "admin" },
+            process.env.JWT_SECRET,
+            { expiresIn: "8h" }
+        );
+        return res.json({ success: true, message: "Admin logged in successfully", token });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: "adminLogin Error" });
+        return res.status(500).json({ success: false, message: "Login failed" });
     }
 };
 
