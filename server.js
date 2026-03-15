@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
-// allowed origins (comma-separated in env, or allow all in development)
+// allowed origins
 const allowedOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
     : ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://127.0.0.1:5174'];
@@ -52,7 +52,7 @@ app.use('/api/user/register', loginLimiter);
 
 // routes
 app.use('/api/admin', adminRouter);
-app.use('/api/doctor', doctorRouter); 
+app.use('/api/doctor', doctorRouter);
 app.use('/api/user', userRouter);
 
 // test route
@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
     res.send('API is working');
 });
 
-// global error handler (e.g. multer fileFilter/limits)
+// global error handler
 app.use((err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ success: false, message: 'File too large. Max size is 5 MB.' });
@@ -72,6 +72,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+}
+
+export default app;
