@@ -1,8 +1,8 @@
 import express from "express";
-import { addDoctor, adminLogin, allDoctors } from "../controllers/AdminController.js";
+import { addDoctor, adminLogin, allDoctors } from "../Controllers/AdminController.js";
 import upload from "../middlewares/multer.js";
 import authAdmin from "../middlewares/authAdmin.js";
-import { changeAvaliabity } from "../controllers/doctorControllers.js"; 
+import { changeAvaliabity } from "../Controllers/doctorControllers.js"; 
 
 const adminRouter = express.Router();
 
