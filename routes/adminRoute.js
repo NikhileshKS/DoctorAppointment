@@ -2,7 +2,7 @@ import express from "express";
 import { addDoctor, adminLogin, allDoctors } from "../controllers/adminController.js";
 import upload from "../middlewares/multer.js";
 import authAdmin from "../middlewares/authAdmin.js";
-import { changeAvaliabity } from "../controllers/doctorControllers.js"; 
+import { changeAvailability } from "../controllers/doctorControllers.js"; 
 
 const adminRouter = express.Router();
 
@@ -13,7 +13,7 @@ adminRouter.post("/login", adminLogin);
 adminRouter.post("/all-doctors",authAdmin, allDoctors);
 
 // change doctor availability
-adminRouter.post("/change-availability", authAdmin,changeAvaliabity);
+adminRouter.post("/change-availability", authAdmin,changeAvailability);
 
 // protected route
 adminRouter.post(
