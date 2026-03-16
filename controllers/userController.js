@@ -10,6 +10,20 @@ import appointmentModel from '../models/appointmentModel.js';
 
 const ALLOWED_ADDRESS_KEYS = ['line1', 'line2', 'city', 'state', 'pincode', 'country'];
 
+// ✅ Cloudinary buffer upload helper (works on Vercel)
+const uploadToCloudinary = (buffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'image' },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+        stream.end(buffer);
+    });
+};
+
 function parseAndSanitizeAddress(addressInput) {
     if (addressInput == null) return undefined;
     const raw = typeof addressInput === 'string' ? addressInput.trim() : String(addressInput);
@@ -138,10 +152,9 @@ const updateProfile = async (req, res) => {
             gender
         });
 
+        // ✅ fixed: use buffer instead of file path
         if (imageFile) {
-            const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-                resource_type: 'image'
-            });
+            const imageUpload = await uploadToCloudinary(imageFile.buffer);
             const imageUrl = imageUpload.secure_url;
             await userModel.findByIdAndUpdate(userId, { image: imageUrl });
         }
@@ -220,7 +233,7 @@ const bookAppointment = async (req, res) => {
     }
 };
 
-// ✅ Display Appointments
+// API to display appointments
 const listAppointment = async (req, res) => {
     try {
         const appointments = await appointmentModel
@@ -277,4 +290,4 @@ const cancelAppointment = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment , cancelAppointment};
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };
