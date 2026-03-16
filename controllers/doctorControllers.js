@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import doctorModel from "../models/DoctorModel.js";
 
-const changeAvaliabity = async (req, res) => {
+const changeAvailability = async (req, res) => {
     try {
         const { docId } = req.body;
         if (!docId || typeof docId !== "string" || !mongoose.Types.ObjectId.isValid(docId)) {
@@ -29,4 +29,4 @@ const doctorList = async (req, res) => {
     }
 }
 
-export { changeAvaliabity, doctorList };
+export { changeAvailability, doctorList };
