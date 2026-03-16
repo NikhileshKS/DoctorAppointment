@@ -4,6 +4,18 @@ import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import doctorModel from "../models/DoctorModel.js";
 
+const uploadToCloudinary = (buffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: "image" },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        );
+        stream.end(buffer);
+    });
+};
 // API to Add Doctor
 const addDoctor = async (req, res) => {
     try {
@@ -51,9 +63,8 @@ const addDoctor = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // 6️⃣ Upload image to Cloudinary
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
-            resource_type: "image",
-        });
+        const imageUpload = await uploadToCloudinary(req.file.buffer);
+        const imageUrl = imageUpload.secure_url;
 
         // 7️⃣ Create doctor object
         const doctorData = {
@@ -84,7 +95,6 @@ const addDoctor = async (req, res) => {
 };
 
 // API For Admin Login
-// Prefer ADMIN_PASSWORD_HASH (bcrypt hash of password); fallback to ADMIN_PASSWORD for backward compatibility
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
