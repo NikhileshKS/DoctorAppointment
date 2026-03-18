@@ -7,6 +7,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import mongoose from 'mongoose';
 import doctorModel from '../models/DoctorModel.js';
 import appointmentModel from '../models/appointmentModel.js';
+import Stripe from 'stripe';
 
 const ALLOWED_ADDRESS_KEYS = ['line1', 'line2', 'city', 'state', 'pincode', 'country'];
 
@@ -290,4 +291,63 @@ const cancelAppointment = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment };
+// payment gateway integration using Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// API to create Stripe payment intent
+const createPaymentIntent = async (req, res) => {
+    try {
+        console.log('STRIPE KEY:', process.env.STRIPE_SECRET_KEY ? 'exists' : 'MISSING'); // ✅
+        console.log('appointmentId:', req.body.appointmentId); // ✅
+
+        const { appointmentId } = req.body;
+
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: 'Appointment not found' });
+        }
+
+        if (appointment.payment) {
+            return res.status(400).json({ success: false, message: 'Already paid' });
+        }
+
+        // amount in smallest currency unit
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: appointment.amount * 100,
+            currency: 'inr',
+            metadata: { appointmentId: appointmentId.toString() }
+        });
+
+        return res.status(200).json({
+            success: true,
+            clientSecret: paymentIntent.client_secret
+        });
+
+    } catch (error) {
+        console.error('Payment Intent Error:', error.message); // ✅ shows exact error
+        return res.status(500).json({ success: false, message: error.message }); // ✅ returns actual error to frontend
+    }
+};
+
+// API to confirm payment and update appointment
+const confirmPayment = async (req, res) => {
+    try {
+        const { appointmentId, paymentIntentId } = req.body;
+
+        // verify payment with Stripe
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+        if (paymentIntent.status !== 'succeeded') {
+            return res.status(400).json({ success: false, message: 'Payment not successful' });
+        }
+
+        await appointmentModel.findByIdAndUpdate(appointmentId, { payment: true });
+
+        return res.status(200).json({ success: true, message: 'Payment confirmed successfully' });
+
+    } catch (error) {
+        console.error('Confirm Payment Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to confirm payment' });
+    }
+};
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment ,createPaymentIntent, confirmPayment};
