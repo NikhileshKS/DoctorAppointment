@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRectangleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faRectangleXmark ,faSquareCheck} from "@fortawesome/free-solid-svg-icons";
 
 const AllAppointment = () => {
 
@@ -89,19 +89,29 @@ const AllAppointment = () => {
                             <p>₹{item.amount}</p>
 
                             {/* Status */}
-                            {item.cancelled ? (
-                                <p className="text-red-500 text-xs font-medium">Cancelled</p>
-                            ) : item.isCompleted ? (
-                                <p className="text-green-500 text-xs font-medium">Completed</p>
-                            ) : (
-                                <FontAwesomeIcon
-                                    icon={faRectangleXmark}
-                                    size="xl"
-                                    style={{ color: "rgb(203, 75, 61)" }}
-                                    className="cursor-pointer hover:scale-110 transition-transform duration-200"
-                                    onClick={() => cancelAppointment(item._id)}
-                                />
-                            )}
+                            <div className="flex items-center gap-2">
+                                {item.cancelled ? (
+                                    <p className="text-red-500 text-xs font-medium">Cancelled</p>
+                                ) : item.payment ? (
+                                    <FontAwesomeIcon
+                                        icon={faSquareCheck}
+                                        size="xl"
+                                        style={{ color: "rgb(32, 220, 76)" }}
+                                    />
+                                ) : (
+                                    <FontAwesomeIcon
+                                        icon={faRectangleXmark}
+                                        size="xl"
+                                        style={{ color: "rgb(203, 75, 61)" }}
+                                        className="cursor-pointer hover:scale-110 transition-transform duration-200"
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to cancel this appointment?")) {
+                                                cancelAppointment(item._id);
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </div>
                         </div>
                     ))
                 )}
