@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 import doctorModel from "../models/DoctorModel.js";
+import appointmentModel from "../models/appointmentModel.js";
+import mongoose from "mongoose";
 
 const uploadToCloudinary = (buffer) => {
     return new Promise((resolve, reject) => {
@@ -141,4 +143,57 @@ const allDoctors = async (req, res) => {
         return res.status(500).json({ success: false, message: "allDoctors Error" });
     }
 }
-export { addDoctor, adminLogin ,allDoctors};
+
+// Api to get all appointment list 
+const appointmentsAdmin = async (req, res) => {
+    try {
+        const appointments = await appointmentModel.find({});
+        return res.json({ success: true, message: "Appointments fetched successfully", appointments });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "appointmentsAdmin Error" });
+    }
+};
+
+// api for appointment cancellation
+const AppointmentCancellation = async (req, res) => {
+    try {
+        const { appointmentId } = req.body;
+
+        if (!appointmentId || !mongoose.Types.ObjectId.isValid(appointmentId)) {
+            return res.status(400).json({ success: false, message: "Invalid appointment ID" });
+        }
+
+        const appointment = await appointmentModel.findById(appointmentId);
+
+        // ✅ check if appointment exists
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: "Appointment not found" });
+        }
+
+        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true });
+
+        const { docId, slotDate, slotTime } = appointment;
+        const doctor = await doctorModel.findById(docId);
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        let slots_blocked = doctor.slots_blocked || {};
+
+        if (slots_blocked[slotDate]) {
+            slots_blocked[slotDate] = slots_blocked[slotDate].filter(t => t !== slotTime);
+        }
+
+        await doctorModel.findByIdAndUpdate(docId, { slots_blocked });
+
+        return res.status(200).json({ success: true, message: "Appointment cancelled successfully" });
+
+    } catch (error) {
+        console.error("Cancel Appointment Error:", error);
+        return res.status(500).json({ success: false, message: "Failed to cancel appointment" });
+    }
+};
+
+export { addDoctor, adminLogin ,allDoctors, appointmentsAdmin, AppointmentCancellation};
