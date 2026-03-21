@@ -1,21 +1,23 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext } from "react";
+import { createContext, useState } from "react";
 
-
+// eslint-disable-next-line react-refresh/only-export-components
 export const DoctorContent = createContext();
 
-// provider component
 const DoctorContextProvider = (props) => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [dToken, setDToken] = useState(localStorage.getItem("dToken") || '');
 
     const value = {
-        // put global states/functions here
+        dToken,
+        setDToken,
+        backendUrl,
     };
 
     return (
         <DoctorContent.Provider value={value}>
-        {props.children}
+            {props.children}
         </DoctorContent.Provider>
     );
-    };
+};
 
 export default DoctorContextProvider;
