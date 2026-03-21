@@ -92,7 +92,8 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
 
-        const user = await userModel.findOne({ email });
+        // ✅ single declaration with lowercase fix
+        const user = await userModel.findOne({ email: email.toLowerCase().trim() });
 
         if (!user) {
             return res.status(400).json({ success: false, message: 'User does not exist' });
