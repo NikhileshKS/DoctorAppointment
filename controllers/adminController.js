@@ -196,4 +196,66 @@ const AppointmentCancellation = async (req, res) => {
     }
 };
 
-export { addDoctor, adminLogin ,allDoctors, appointmentsAdmin, AppointmentCancellation};
+const getDashboardData = async (req, res) => {
+    try {
+        // get counts
+        const totalDoctors = await doctorModel.countDocuments();
+        const totalAppointments = await appointmentModel.countDocuments();
+        
+        // total unique patients
+        const totalPatients = await appointmentModel.distinct('userId');
+        
+        // latest 5 appointments
+        const latestAppointments = await appointmentModel
+            .find({})
+            .sort({ date: -1 })
+            .limit(5);
+
+        const dashboardData = {
+            totalDoctors,
+            totalAppointments,
+            totalPatients: totalPatients.length,
+            latestAppointments,
+        };
+
+        return res.status(200).json({ success: true, dashboardData });
+
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+        return res.status(500).json({ success: false, message: "Failed to fetch dashboard data" });
+    }
+};
+
+// API to reset doctor password
+const resetDoctorPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+            return res.status(400).json({ success: false, message: "Email and new password required" });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+        }
+
+        const doctor = await doctorModel.findOne({ email: email.toLowerCase().trim() });
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await doctorModel.findByIdAndUpdate(doctor._id, { password: hashedPassword });
+
+        return res.status(200).json({ success: true, message: "Password reset successfully" });
+
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+        return res.status(500).json({ success: false, message: "Failed to reset password" });
+    }
+};
+
+export { addDoctor, adminLogin ,allDoctors, appointmentsAdmin, AppointmentCancellation, getDashboardData ,resetDoctorPassword};
