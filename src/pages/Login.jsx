@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
+import { DoctorContent } from "../context/DoctorContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FiEye, FiEyeOff } from "react-icons/fi";
@@ -12,13 +13,13 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const { setAToken, backendUrl } = useContext(AdminContext);
+    const { setDToken } = useContext(DoctorContent);
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
 
         try {
             if (state === "Admin") {
-
                 const { data } = await axios.post(`${backendUrl}/api/admin/login`, {
                     email,
                     password
@@ -32,6 +33,23 @@ const Login = () => {
                     toast.error(data.message);
                 }
             }
+
+            // ✅ Doctor login block
+            if (state === "Doctor") {
+                const { data } = await axios.post(`${backendUrl}/api/doctor/login`, {
+                    email,
+                    password
+                });
+
+                if (data.success) {
+                    localStorage.setItem("dToken", data.token);
+                    setDToken(data.token);
+                    toast.success("Doctor login successful!");
+                } else {
+                    toast.error(data.message);
+                }
+            }
+
         } catch (error) {
             toast.error(error.response?.data?.message || "Login failed");
         }
@@ -58,7 +76,6 @@ const Login = () => {
 
                 <div className="w-full">
                     <p>Password</p>
-
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -67,7 +84,6 @@ const Login = () => {
                             className="border rounded w-full p-2 mt-1 outline-none pr-10 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
                             required
                         />
-
                         <button
                             type="button"
                             onClick={() => setShowPassword(prev => !prev)}
@@ -77,7 +93,7 @@ const Login = () => {
                     </div>
                 </div>
 
-                <button className="bg-blue-600 text-white w-full py-2 rounded-md">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition-colors">
                     Login
                 </button>
 
