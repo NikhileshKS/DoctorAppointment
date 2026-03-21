@@ -1,5 +1,5 @@
 import express from "express";
-import { addDoctor, adminLogin, allDoctors, appointmentsAdmin,AppointmentCancellation } from "../controllers/adminController.js";
+import { addDoctor, adminLogin, allDoctors, appointmentsAdmin,AppointmentCancellation ,getDashboardData,resetDoctorPassword} from "../controllers/adminController.js";
 import upload from "../middlewares/multer.js";
 import authAdmin from "../middlewares/authAdmin.js";
 import { changeAvailability } from "../controllers/doctorControllers.js"; 
@@ -20,6 +20,12 @@ adminRouter.post("/appointments", authAdmin, appointmentsAdmin);
 
 // Api AppointmentCancellation
 adminRouter.post("/cancel-appointment", authAdmin, AppointmentCancellation);
+
+// get dashboard data
+adminRouter.get('/dashboard', authAdmin, getDashboardData);
+
+// reset doctor password
+adminRouter.post('/reset-doctor-password', authAdmin, resetDoctorPassword);
 
 // protected route
 adminRouter.post(
