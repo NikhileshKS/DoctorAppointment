@@ -297,8 +297,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // API to create Stripe payment intent
 const createPaymentIntent = async (req, res) => {
     try {
-        console.log('STRIPE KEY:', process.env.STRIPE_SECRET_KEY ? 'exists' : 'MISSING'); // ✅
-        console.log('appointmentId:', req.body.appointmentId); // ✅
+        console.log('STRIPE KEY:', process.env.STRIPE_SECRET_KEY ? 'exists' : 'MISSING'); 
+        console.log('appointmentId:', req.body.appointmentId); 
 
         const { appointmentId } = req.body;
 
@@ -325,8 +325,8 @@ const createPaymentIntent = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Payment Intent Error:', error.message); // ✅ shows exact error
-        return res.status(500).json({ success: false, message: error.message }); // ✅ returns actual error to frontend
+        console.error('Payment Intent Error:', error.message); 
+        return res.status(500).json({ success: false, message: error.message }); 
     }
 };
 
