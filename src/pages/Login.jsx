@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useContext } from "react";
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { FaUser,FaEnvelope } from "react-icons/fa";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
@@ -16,6 +17,10 @@ const LoginSignup = () => {
     const [signupData, setSignupData] = useState({ username: "", email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+
+    // ── Password visibility ──
+    const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [showSignupPassword, setShowSignupPassword] = useState(false);
 
     // ── Input handlers ──
     const handleLoginChange = (e) => {
@@ -93,7 +98,7 @@ const LoginSignup = () => {
         setLoading(true);
         try {
             const { data } = await axios.post(`${backendURL}/api/user/register`, {
-                name: signupData.username,   // ✅ maps "username" → "name" for backend
+                name: signupData.username,
                 email: signupData.email,
                 password: signupData.password,
             });
@@ -116,9 +121,11 @@ const LoginSignup = () => {
     const [exitDirection, setExitDirection] = useState("login");
 
     const toggleFormType = (type) => {
-        setExitDirection(formType);   
+        setExitDirection(formType);
         setErrors({});
         setFormType(type);
+        setShowLoginPassword(false);
+        setShowSignupPassword(false);
         if (type === "login") {
             setSignupData({ username: "", email: "", password: "" });
         } else {
@@ -171,14 +178,22 @@ const LoginSignup = () => {
                                     {/* Password */}
                                     <div className="relative">
                                         <input
-                                            type="password"
+                                            type={showLoginPassword ? "text" : "password"}
                                             name="password"
                                             placeholder="Password"
                                             value={loginData.password}
                                             onChange={handleLoginChange}
                                             className={`w-full py-2 pl-4 pr-10 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all ${errors.password ? "border border-red-500" : ""}`}
                                         />
-                                        <FaLock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowLoginPassword((prev) => !prev)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            {showLoginPassword
+                                                ? <IoEye size={18} />
+                                                : <IoEyeOff size={18} />}
+                                        </button>
                                         {errors.password && (
                                             <p className="text-red-500 text-xs text-left mt-1">{errors.password}</p>
                                         )}
@@ -246,14 +261,22 @@ const LoginSignup = () => {
                                     {/* Password */}
                                     <div className="relative">
                                         <input
-                                            type="password"
+                                            type={showSignupPassword ? "text" : "password"}
                                             name="password"
                                             placeholder="Password"
                                             value={signupData.password}
                                             onChange={handleSignupChange}
                                             className={`w-full py-2 pl-4 pr-10 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all ${errors.password ? "border border-red-500" : ""}`}
                                         />
-                                        <FaLock className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowSignupPassword((prev) => !prev)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            {showSignupPassword
+                                                ? <IoEye size={18} />
+                                                : <IoEyeOff size={18} />}
+                                        </button>
                                         {errors.password && (
                                             <p className="text-red-500 text-xs text-left mt-1">{errors.password}</p>
                                         )}
