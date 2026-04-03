@@ -32,10 +32,7 @@ const Login = () => {
                 } else {
                     toast.error(data.message);
                 }
-            }
-
-            // ✅ Doctor login block
-            if (state === "Doctor") {
+            } else if (state === "Doctor") {
                 const { data } = await axios.post(`${backendUrl}/api/doctor/login`, {
                     email,
                     password
