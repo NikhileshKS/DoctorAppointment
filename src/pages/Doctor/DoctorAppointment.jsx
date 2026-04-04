@@ -72,12 +72,13 @@ const DoctorAppointment = () => {
             <div className="bg-white border rounded text-sm max-h-[80vh] min-h-[60vh] overflow-y-scroll">
 
                 {/* Header */}
-                <div className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr] py-3 px-6 border-b bg-gray-50 font-medium">
+                <div className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr_1fr] py-3 px-6 border-b bg-gray-50 font-medium">
                     <p>#</p>
                     <p>Patient</p>
                     <p>Age</p>
                     <p>Date & Time</p>
                     <p>Fees</p>
+                    <p>Payment</p>
                     <p>Action</p>
                 </div>
 
@@ -89,7 +90,7 @@ const DoctorAppointment = () => {
                     appointments.map((item, index) => (
                         <div
                             key={item._id}
-                            className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr] py-3 px-6 border-b hover:bg-gray-50 transition items-center"
+                            className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr_1fr] py-3 px-6 border-b hover:bg-gray-50 transition items-center"
                         >
                             {/* # */}
                             <p className="text-gray-500">{index + 1}</p>
@@ -115,6 +116,11 @@ const DoctorAppointment = () => {
 
                             {/* Fees */}
                             <p>₹{item.amount}</p>
+
+                            {/* Payment */}
+                            <p className={`text-xs font-medium ${item.payment ? 'text-green-600' : 'text-yellow-500'}`}>
+                                {item.payment ? 'Paid' : 'Pending'}
+                            </p>
 
                             {/* Action */}
                             <div className="flex items-center gap-2">
