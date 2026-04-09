@@ -15,7 +15,7 @@ const DoctorAppointment = () => {
                 { headers: { dtoken: dToken } }
             );
             if (data.success) {
-                setAppointments(data.appointments.reverse());
+                setAppointments(data.appointments);
             } else {
                 toast.error(data.message);
             }
