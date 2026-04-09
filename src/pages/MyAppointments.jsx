@@ -26,7 +26,7 @@ const MyAppointments = () => {
                 headers: { token },
             })
             if (data.success) {
-                setAppointments(data.appointments.reverse().filter(a => a.docData))
+                setAppointments(data.appointments.filter(a => a.docData))
             } else {
                 toast.error(data.message || 'Failed to load appointments')
             }
