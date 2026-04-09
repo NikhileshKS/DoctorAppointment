@@ -57,7 +57,7 @@ const AdminContextProvider = ({ children }) => {
                 { headers: { atoken: aToken } }
             );
             if (data.success) {
-                setAppointments(data.appointments);
+                setAppointments([...data.appointments].sort((a, b) => b.date - a.date));
                 console.log(data.appointments);
             } else {
                 toast.error(data.message);
