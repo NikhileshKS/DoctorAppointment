@@ -147,7 +147,7 @@ const allDoctors = async (req, res) => {
 // Api to get all appointment list 
 const appointmentsAdmin = async (req, res) => {
     try {
-        const appointments = await appointmentModel.find({});
+        const appointments = await appointmentModel.find({}.sort({ date: -1 }));
         return res.json({ success: true, message: "Appointments fetched successfully", appointments });
     } catch (error) {
         console.error(error);
