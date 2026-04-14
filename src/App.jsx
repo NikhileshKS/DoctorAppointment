@@ -1,6 +1,6 @@
-/* eslint-disable no-unused-vars */
+// eslint-disable-next-line no-unused-vars
 import React from 'react'
-import { Route,Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import Doctors from './pages/Doctors'
 import Login from './pages/Login'
@@ -9,6 +9,8 @@ import Contact from './pages/Contact'
 import Myprofile from './pages/Myprofile'
 import MyAppointments from './pages/MyAppointments'
 import Appointment from './pages/Appointment'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { ToastContainer } from "react-toastify";
@@ -17,20 +19,22 @@ import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   return (
     <div className='mx-4 sm:mx-[10%]'>
-    <ToastContainer />
-    <Navbar/>
-    <Routes>
-      <Route path='/' element={<Home/>}/>
-      <Route path='/doctors' element={<Doctors/>}/>
-      <Route path='/doctors/:speciality' element={<Doctors/>}/>
-      <Route path='/login' element={<Login/>}/>
-      <Route path='/about' element={<About/>}/>
-      <Route path='/contact' element={<Contact/>}/>
-      <Route path='/my-profile' element={<Myprofile/>}/>
-      <Route path='/my-appointments' element={<MyAppointments/>}/>
-      <Route path="/appointment/:docId" element={<Appointment />}/>
-    </Routes>
-    <Footer/>
+      <ToastContainer />
+      <Navbar />
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/doctors' element={<Doctors />} />
+        <Route path='/doctors/:speciality' element={<Doctors />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/contact' element={<Contact />} />
+        <Route path='/my-profile' element={<Myprofile />} />
+        <Route path='/my-appointments' element={<MyAppointments />} />
+        <Route path='/appointment/:docId' element={<Appointment />} />
+        <Route path='/forgot-password' element={<ForgotPassword />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
+      </Routes>
+      <Footer />
     </div>
   )
 }
