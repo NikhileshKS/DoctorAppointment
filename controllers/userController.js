@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import doctorModel from '../models/DoctorModel.js';
 import appointmentModel from '../models/appointmentModel.js';
 import Stripe from 'stripe';
+import nodemailer from 'nodemailer';
 
 const ALLOWED_ADDRESS_KEYS = ['line1', 'line2', 'city', 'state', 'pincode', 'country'];
 
@@ -351,4 +352,122 @@ const confirmPayment = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Failed to confirm payment' });
     }
 };
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment ,createPaymentIntent, confirmPayment};
+
+// ── Forgot Password ──
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email is required' });
+        }
+
+        const user = await userModel.findOne({ email: email.toLowerCase().trim() });
+
+        // Security: same response whether user exists or not
+        if (!user) {
+            return res.status(200).json({
+                success: true,
+                message: 'If this email is registered, a reset link has been sent.'
+            });
+        }
+
+        // Generate reset token
+        const resetToken = jwt.sign(
+            { userId: user._id, purpose: 'password-reset' },
+            process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+        // Send Email
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: `"MyDoctorAppointment" <${process.env.EMAIL_USER}>`,
+            to: user.email,
+            subject: 'Password Reset Request',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h2 style="color: #5f6fff; text-align: center;">MyDoctorAppointment</h2>
+                    <p>Hello <strong>${user.name}</strong>,</p>
+                    <p>We received a request to reset your password. Click the button below to reset it.</p>
+                    <p>This link will expire in <strong>15 minutes</strong>.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resetLink}"
+                        style="background-color: #5f6fff; color: white; padding: 12px 30px;
+                                border-radius: 8px; text-decoration: none; font-size: 16px;">
+                            Reset Password
+                        </a>
+                    </div>
+                    <p>If you did not request a password reset, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        © 2024 MyDoctorAppointment. All rights reserved.
+                    </p>
+                </div>
+            `,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'If this email is registered, a reset link has been sent.'
+        });
+
+    } catch (error) {
+        console.error('Forgot Password Error:', error);
+        return res.status(500).json({ success: false, message: 'Something went wrong' });
+    }
+};
+
+// ── Reset Password ──
+const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Token and new password are required' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+        }
+
+        // Verify token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch {
+            return res.status(400).json({ success: false, message: 'Invalid or expired reset link' });
+        }
+
+        if (decoded.purpose !== 'password-reset') {
+            return res.status(400).json({ success: false, message: 'Invalid token' });
+        }
+
+        const user = await userModel.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await userModel.findByIdAndUpdate(decoded.userId, { password: hashedPassword });
+
+        return res.status(200).json({ success: true, message: 'Password reset successfully' });
+
+    } catch (error) {
+        console.error('Reset Password Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
+};
+
+export { registerUser, loginUser, getProfile, updateProfile, bookAppointment, listAppointment, cancelAppointment ,createPaymentIntent, confirmPayment, forgotPassword, resetPassword };
