@@ -72,7 +72,7 @@ const Footer = () => {
       {/*.............CopyRight........ */}
       <div>
         <hr />
-        <p className='py-5 text-sm text-center'>Copyright 2024 @MyDoctors - All Rights Reserved</p>
+        <p className='py-5 text-sm text-center'>Copyright 2026 @MyDoctors - All Rights Reserved</p>
       </div>
     </div>
   )
