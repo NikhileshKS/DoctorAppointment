@@ -410,7 +410,7 @@ const forgotPassword = async (req, res) => {
                     <p>If you did not request a password reset, please ignore this email.</p>
                     <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
                     <p style="color: #999; font-size: 12px; text-align: center;">
-                        © 2024 MyDoctorAppointment. All rights reserved.
+                        © 2026 MyDoctorAppointment. All rights reserved.
                     </p>
                 </div>
             `,
