@@ -88,7 +88,8 @@ const getDoctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
     try {
         const { fees, address, available, about } = req.body;
-        await doctorModel.findByIdAndUpdate(req.docId, { fees, address, available, about });
+        const parsedAddress = typeof address === 'string' ? JSON.parse(address) : address;
+        await doctorModel.findByIdAndUpdate(req.docId, { fees, address: parsedAddress, available, about });
         return res.status(200).json({ success: true, message: "Profile updated successfully" });
     } catch (error) {
         console.error("Update Doctor Profile Error:", error);
