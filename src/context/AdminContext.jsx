@@ -21,7 +21,6 @@ const AdminContextProvider = ({ children }) => {
             );
             if (data.success) {
                 setDoctors(data.doctors);
-                console.log(data.doctors);
             } else {
                 toast.error(data.message);
             }
@@ -58,7 +57,6 @@ const AdminContextProvider = ({ children }) => {
             );
             if (data.success) {
                 setAppointments([...data.appointments].sort((a, b) => b.date - a.date));
-                console.log(data.appointments);
             } else {
                 toast.error(data.message);
             }
