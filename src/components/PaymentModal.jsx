@@ -107,6 +107,7 @@ const PaymentModal = ({ clientSecret, onSuccess, onClose }) => {
 // ✅ fix ESLint prop validation warnings
 PaymentModal.propTypes = {
     clientSecret: PropTypes.string.isRequired,
+    appointmentId: PropTypes.string,
     onSuccess: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
 }

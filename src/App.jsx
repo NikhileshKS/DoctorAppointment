@@ -33,6 +33,13 @@ const App = () => {
         <Route path='/appointment/:docId' element={<Appointment />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='*' element={
+          <div className='min-h-[60vh] flex flex-col items-center justify-center text-center'>
+            <h1 className='text-6xl font-bold text-gray-300'>404</h1>
+            <p className='text-xl text-gray-500 mt-4'>Page not found</p>
+            <a href='/' className='mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors'>Go Home</a>
+          </div>
+        } />
       </Routes>
       <Footer />
     </div>
