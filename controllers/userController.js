@@ -389,6 +389,15 @@ const forgotPassword = async (req, res) => {
 
         const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
+        // Guard: if email env vars are not configured, log the link and return success
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.log('Reset link (email not configured):', resetLink);
+            return res.status(200).json({
+                success: true,
+                message: 'If this email is registered, a reset link has been sent.'
+            });
+        }
+
         // Send Email
         const transporter = nodemailer.createTransport({
             service: 'gmail',
