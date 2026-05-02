@@ -50,7 +50,7 @@ const addDoctor = async (req, res) => {
         }
 
         // 3️⃣ Check duplicate email
-        const existingDoctor = await doctorModel.findOne({ email });
+        const existingDoctor = await doctorModel.findOne({ email: email.toLowerCase().trim() });
         if (existingDoctor) {
             return res.status(409).json({ success: false, message: "Doctor already exists with this email" });
         }
