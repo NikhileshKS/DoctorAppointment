@@ -49,6 +49,7 @@ const loginLimiter = rateLimit({
 app.use('/api/admin/login', loginLimiter);
 app.use('/api/user/login', loginLimiter);
 app.use('/api/user/register', loginLimiter);
+app.use('/api/user/forgot-password', loginLimiter);
 
 // routes
 app.use('/api/admin', adminRouter);
