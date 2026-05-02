@@ -41,8 +41,6 @@ const doctorLogin = async (req, res) => {
         }
 
         const doctor = await doctorModel.findOne({ email: email.toLowerCase().trim() });
-        console.log("Doctor found:", doctor ? "YES" : "NO");
-        console.log("Stored hash:", doctor?.password);
 
         if (!doctor) {
             return res.status(400).json({ success: false, message: "Doctor not found" });

@@ -17,7 +17,7 @@ const doctorRouter = express.Router();
 // ── Public ──
 doctorRouter.get("/list", doctorList);
 doctorRouter.post("/login", doctorLogin);
-doctorRouter.post("/change-availability", changeAvailability);
+doctorRouter.post("/change-availability", authDoctor, changeAvailability);
 
 // ── Protected ──
 doctorRouter.get("/dashboard", authDoctor, getDoctorDashboard);

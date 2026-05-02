@@ -61,7 +61,8 @@ const registerUser = async (req, res) => {
             return res.status(400).json({success: false, message: 'Password must be at least 8 characters long' });
         }
 
-        const existingUser = await userModel.findOne({ email });
+        const normalizedEmail = email.toLowerCase().trim();
+        const existingUser = await userModel.findOne({ email: normalizedEmail });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'Email already registered. Please login.' });
         }
@@ -69,7 +70,7 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const userData = { name, email, password: hashedPassword };
+        const userData = { name, email: normalizedEmail, password: hashedPassword };
         
         const newUser = new userModel(userData);
         const user = await newUser.save();
@@ -298,9 +299,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // API to create Stripe payment intent
 const createPaymentIntent = async (req, res) => {
     try {
-        console.log('STRIPE KEY:', process.env.STRIPE_SECRET_KEY ? 'exists' : 'MISSING'); 
-        console.log('appointmentId:', req.body.appointmentId); 
-
         const { appointmentId } = req.body;
 
         const appointment = await appointmentModel.findById(appointmentId);
@@ -326,15 +324,25 @@ const createPaymentIntent = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Payment Intent Error:', error.message); 
-        return res.status(500).json({ success: false, message: error.message }); 
+        console.error('Payment Intent Error:', error.message);
+        return res.status(500).json({ success: false, message: 'Failed to create payment intent' });
     }
 };
 
 // API to confirm payment and update appointment
 const confirmPayment = async (req, res) => {
     try {
+        const userId = req.userId;
         const { appointmentId, paymentIntentId } = req.body;
+
+        // verify appointment belongs to this user
+        const appointment = await appointmentModel.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: 'Appointment not found' });
+        }
+        if (appointment.userId.toString() !== userId.toString()) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
 
         // verify payment with Stripe
         const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
