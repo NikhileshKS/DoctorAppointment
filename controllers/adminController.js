@@ -66,7 +66,6 @@ const addDoctor = async (req, res) => {
 
         // 6️⃣ Upload image to Cloudinary
         const imageUpload = await uploadToCloudinary(req.file.buffer);
-        const imageUrl = imageUpload.secure_url;
 
         // 7️⃣ Create doctor object
         const doctorData = {
