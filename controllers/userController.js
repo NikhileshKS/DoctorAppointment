@@ -295,10 +295,15 @@ const cancelAppointment = async (req, res) => {
 };
 
 // payment gateway integration using Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY
+    ? new Stripe(process.env.STRIPE_SECRET_KEY)
+    : null;
 // API to create Stripe payment intent
 const createPaymentIntent = async (req, res) => {
     try {
+        if (!stripe) {
+            return res.status(503).json({ success: false, message: 'Payment service not configured' });
+        }
         const { appointmentId } = req.body;
 
         const appointment = await appointmentModel.findById(appointmentId);
@@ -332,6 +337,9 @@ const createPaymentIntent = async (req, res) => {
 // API to confirm payment and update appointment
 const confirmPayment = async (req, res) => {
     try {
+        if (!stripe) {
+            return res.status(503).json({ success: false, message: 'Payment service not configured' });
+        }
         const userId = req.userId;
         const { appointmentId, paymentIntentId } = req.body;
 
