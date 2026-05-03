@@ -50,6 +50,8 @@ app.use('/api/admin/login', loginLimiter);
 app.use('/api/user/login', loginLimiter);
 app.use('/api/user/register', loginLimiter);
 app.use('/api/user/forgot-password', loginLimiter);
+app.use('/api/doctor/forgot-password', loginLimiter);
+app.use('/api/doctor/login', loginLimiter);
 
 // routes
 app.use('/api/admin', adminRouter);

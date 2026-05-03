@@ -8,7 +8,9 @@ import {
     getDoctorAppointments,
     completeAppointment,
     cancelAppointmentByDoctor,
-    getDoctorDashboard
+    getDoctorDashboard,
+    forgotDoctorPassword,
+    resetDoctorPasswordSelf
 } from "../controllers/doctorControllers.js";
 import authDoctor from "../middlewares/authDoctor.js";
 
@@ -17,6 +19,8 @@ const doctorRouter = express.Router();
 // ── Public ──
 doctorRouter.get("/list", doctorList);
 doctorRouter.post("/login", doctorLogin);
+doctorRouter.post("/forgot-password", forgotDoctorPassword);
+doctorRouter.post("/reset-password", resetDoctorPasswordSelf);
 doctorRouter.post("/change-availability", authDoctor, changeAvailability);
 
 // ── Protected ──

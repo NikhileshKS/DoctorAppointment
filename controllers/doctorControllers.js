@@ -3,6 +3,7 @@ import doctorModel from "../models/DoctorModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
+import nodemailer from "nodemailer";
 
 const changeAvailability = async (req, res) => {
     try {
@@ -206,6 +207,133 @@ const getDoctorDashboard = async (req, res) => {
     }
 };
 
+// ── Doctor Forgot Password (Self-Service) ──
+const forgotDoctorPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email is required' });
+        }
+
+        const doctor = await doctorModel.findOne({ email: email.toLowerCase().trim() });
+
+        // Security: same response whether doctor exists or not
+        if (!doctor) {
+            return res.status(200).json({
+                success: true,
+                message: 'If this email is registered, a reset link has been sent.'
+            });
+        }
+
+        // Generate reset token
+        const resetToken = jwt.sign(
+            { docId: doctor._id, purpose: 'doctor-password-reset' },
+            process.env.JWT_SECRET,
+            { expiresIn: '15m' }
+        );
+
+        const adminUrl = process.env.ADMIN_URL || 'http://localhost:5174';
+        const resetLink = `${adminUrl}/reset-password?token=${resetToken}`;
+
+        // Guard: if email env vars are not configured, log the link
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.log('Doctor reset link (email not configured):', resetLink);
+            return res.status(200).json({
+                success: true,
+                message: 'If this email is registered, a reset link has been sent.'
+            });
+        }
+
+        // Send Email
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: `"MyDoctorAppointment" <${process.env.EMAIL_USER}>`,
+            to: doctor.email,
+            subject: 'Doctor Password Reset Request',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <h2 style="color: #5f6fff; text-align: center;">MyDoctorAppointment</h2>
+                    <p>Hello <strong>Dr. ${doctor.name}</strong>,</p>
+                    <p>We received a request to reset your password. Click the button below to reset it.</p>
+                    <p>This link will expire in <strong>15 minutes</strong>.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${resetLink}"
+                        style="background-color: #5f6fff; color: white; padding: 12px 30px;
+                                border-radius: 8px; text-decoration: none; font-size: 16px;">
+                            Reset Password
+                        </a>
+                    </div>
+                    <p>If you did not request a password reset, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        © 2026 MyDoctorAppointment. All rights reserved.
+                    </p>
+                </div>
+            `,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'If this email is registered, a reset link has been sent.'
+        });
+
+    } catch (error) {
+        console.error('Doctor Forgot Password Error:', error);
+        return res.status(500).json({ success: false, message: 'Something went wrong' });
+    }
+};
+
+// ── Doctor Reset Password (Self-Service) ──
+const resetDoctorPasswordSelf = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Token and new password are required' });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters' });
+        }
+
+        // Verify token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch {
+            return res.status(400).json({ success: false, message: 'Invalid or expired reset link' });
+        }
+
+        if (decoded.purpose !== 'doctor-password-reset') {
+            return res.status(400).json({ success: false, message: 'Invalid token' });
+        }
+
+        const doctor = await doctorModel.findById(decoded.docId);
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: 'Doctor not found' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await doctorModel.findByIdAndUpdate(decoded.docId, { password: hashedPassword });
+
+        return res.status(200).json({ success: true, message: 'Password reset successfully' });
+
+    } catch (error) {
+        console.error('Doctor Reset Password Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
+};
+
 export { 
     changeAvailability, 
     doctorList, 
@@ -215,5 +343,7 @@ export {
     getDoctorAppointments,
     completeAppointment,
     cancelAppointmentByDoctor,
-    getDoctorDashboard
+    getDoctorDashboard,
+    forgotDoctorPassword,
+    resetDoctorPasswordSelf
 };
