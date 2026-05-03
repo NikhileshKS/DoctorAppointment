@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AdminContext } from "../context/AdminContext";
-import { DoctorContent } from "../context/DoctorContext";
+import { DoctorContext } from "../context/DoctorContext";
 
 import Dashboard from "../assets/Dashboard.png";
 import Appointment from "../assets/re-appointment.png";
@@ -26,7 +26,7 @@ const doctorNavItems = [
 
 const Sidebar = () => {
     const { aToken } = useContext(AdminContext);
-    const { dToken } = useContext(DoctorContent);
+    const { dToken } = useContext(DoctorContext);
     const [isOpen, setIsOpen] = useState(true);
 
     // ── hide sidebar if not logged in ──

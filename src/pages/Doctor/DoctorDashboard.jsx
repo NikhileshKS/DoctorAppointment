@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { DoctorContent } from "../../context/DoctorContext";
+import { DoctorContext } from "../../context/DoctorContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { assets } from "../../assets/assets";
 
 const DoctorDashboard = () => {
-    const { dToken, backendUrl } = useContext(DoctorContent);
+    const { dToken, backendUrl } = useContext(DoctorContext);
     const [dashData, setDashData] = useState(null);
 
     const getDashData = async () => {

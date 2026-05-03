@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const DoctorContent = createContext();
+export const DoctorContext = createContext();
 
 const DoctorContextProvider = (props) => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -14,9 +14,9 @@ const DoctorContextProvider = (props) => {
     };
 
     return (
-        <DoctorContent.Provider value={value}>
+        <DoctorContext.Provider value={value}>
             {props.children}
-        </DoctorContent.Provider>
+        </DoctorContext.Provider>
     );
 };
 

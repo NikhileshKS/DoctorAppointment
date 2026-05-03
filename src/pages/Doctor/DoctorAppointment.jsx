@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { DoctorContent } from "../../context/DoctorContext";
+import { DoctorContext } from "../../context/DoctorContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { assets } from "../../assets/assets";
 
 const DoctorAppointment = () => {
-    const { dToken, backendUrl } = useContext(DoctorContent);
+    const { dToken, backendUrl } = useContext(DoctorContext);
     const [appointments, setAppointments] = useState([]);
 
     const getAppointments = async () => {
@@ -88,64 +88,118 @@ const DoctorAppointment = () => {
                     </div>
                 ) : (
                     appointments.map((item, index) => (
-                        <div
-                            key={item._id}
-                            className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr_1fr] py-3 px-6 border-b hover:bg-gray-50 transition items-center"
-                        >
-                            {/* # */}
-                            <p className="text-gray-500">{index + 1}</p>
+                        <React.Fragment key={item._id}>
+                            {/* Desktop Row */}
+                            <div
+                                className="hidden sm:grid grid-cols-[0.5fr_2fr_1fr_2fr_1fr_1fr_1fr] py-3 px-6 border-b hover:bg-gray-50 transition items-center"
+                            >
+                                {/* # */}
+                                <p className="text-gray-500">{index + 1}</p>
 
-                            {/* Patient */}
-                            <div className="flex items-center gap-2">
-                                <img
-                                    src={item.userData?.image}
-                                    alt={item.userData?.name}
-                                    className="w-8 h-8 rounded-full object-cover"
-                                />
-                                <p>{item.userData?.name}</p>
+                                {/* Patient */}
+                                <div className="flex items-center gap-2">
+                                    <img
+                                        src={item.userData?.image}
+                                        alt={item.userData?.name}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                    <p>{item.userData?.name}</p>
+                                </div>
+
+                                {/* Age */}
+                                <p>{item.userData?.dob
+                                    ? Math.floor((Date.now() - new Date(item.userData.dob)) / (1000 * 60 * 60 * 24 * 365.25))
+                                    : 'N/A'}
+                                </p>
+
+                                {/* Date & Time */}
+                                <p>{item.slotDate?.split('_').map(p => p.padStart(2,'0')).join('-')} | {item.slotTime}</p>
+
+                                {/* Fees */}
+                                <p>₹{item.amount}</p>
+
+                                {/* Payment */}
+                                <p className={`text-xs font-medium ${item.payment ? 'text-green-600' : 'text-yellow-500'}`}>
+                                    {item.payment ? 'Paid' : 'Pending'}
+                                </p>
+
+                                {/* Action */}
+                                <div className="flex items-center gap-2">
+                                    {item.cancelled ? (
+                                        <p className="text-red-500 text-xs font-medium">Cancelled</p>
+                                    ) : item.isCompleted ? (
+                                        <p className="text-green-600 text-xs font-medium">Completed</p>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <img
+                                                onClick={() => cancelAppointment(item._id)}
+                                                src={assets.cancel_icon}
+                                                alt="Cancel"
+                                                className="w-8 cursor-pointer hover:scale-110 transition"
+                                            />
+                                            <img
+                                                onClick={() => completeAppointment(item._id)}
+                                                src={assets.tick_icon}
+                                                alt="Complete"
+                                                className="w-8 cursor-pointer hover:scale-110 transition"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Age */}
-                            <p>{item.userData?.dob
-                                ? Math.floor((Date.now() - new Date(item.userData.dob)) / (1000 * 60 * 60 * 24 * 365.25))
-                                : 'N/A'}
-                            </p>
-
-                            {/* Date & Time */}
-                            <p>{item.slotDate?.split('_').map(p => p.padStart(2,'0')).join('-')} | {item.slotTime}</p>
-
-                            {/* Fees */}
-                            <p>₹{item.amount}</p>
-
-                            {/* Payment */}
-                            <p className={`text-xs font-medium ${item.payment ? 'text-green-600' : 'text-yellow-500'}`}>
-                                {item.payment ? 'Paid' : 'Pending'}
-                            </p>
-
-                            {/* Action */}
-                            <div className="flex items-center gap-2">
-                                {item.cancelled ? (
-                                    <p className="text-red-500 text-xs font-medium">Cancelled</p>
-                                ) : item.isCompleted ? (
-                                    <p className="text-green-600 text-xs font-medium">Completed</p>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        <img
-                                            onClick={() => cancelAppointment(item._id)}
-                                            src={assets.cancel_icon}
-                                            alt="Cancel"
-                                            className="w-8 cursor-pointer hover:scale-110 transition"
-                                        />
-                                        <img
-                                            onClick={() => completeAppointment(item._id)}
-                                            src={assets.tick_icon}
-                                            alt="Complete"
-                                            className="w-8 cursor-pointer hover:scale-110 transition"
-                                        />
+                            {/* Mobile Card */}
+                            <div className="sm:hidden flex flex-col gap-2 p-4 border-b">
+                                <div className="flex items-center gap-3">
+                                    <img
+                                        src={item.userData?.image}
+                                        alt={item.userData?.name}
+                                        className="w-10 h-10 rounded-full object-cover"
+                                    />
+                                    <div>
+                                        <p className="font-medium">{item.userData?.name}</p>
+                                        <p className="text-xs text-gray-500">
+                                            Age: {item.userData?.dob
+                                                ? Math.floor((Date.now() - new Date(item.userData.dob)) / (1000 * 60 * 60 * 24 * 365.25))
+                                                : 'N/A'}
+                                        </p>
                                     </div>
-                                )}
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                    {item.slotDate?.split('_').map(p => p.padStart(2,'0')).join('-')} | {item.slotTime}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <p className="text-sm font-medium">₹{item.amount}</p>
+                                        <span className={`text-xs font-medium ${item.payment ? 'text-green-600' : 'text-yellow-500'}`}>
+                                            {item.payment ? 'Paid' : 'Pending'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        {item.cancelled ? (
+                                            <span className="text-red-500 text-xs font-medium">Cancelled</span>
+                                        ) : item.isCompleted ? (
+                                            <span className="text-green-600 text-xs font-medium">Completed</span>
+                                        ) : (
+                                            <div className="flex gap-2">
+                                                <img
+                                                    onClick={() => cancelAppointment(item._id)}
+                                                    src={assets.cancel_icon}
+                                                    alt="Cancel"
+                                                    className="w-7 cursor-pointer hover:scale-110 transition"
+                                                />
+                                                <img
+                                                    onClick={() => completeAppointment(item._id)}
+                                                    src={assets.tick_icon}
+                                                    alt="Complete"
+                                                    className="w-7 cursor-pointer hover:scale-110 transition"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </React.Fragment>
                     ))
                 )}
             </div>

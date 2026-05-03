@@ -58,6 +58,8 @@ const AddDoctor = () => {
                 setAddress1('');
                 setAddress2('');
                 setAbout('');
+                setSpeciality('General Physician');
+                setExperience('1 Year');
             } else {
                 toast.error(data.message);
             }

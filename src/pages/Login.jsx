@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
-import { DoctorContent } from "../context/DoctorContext";
+import { DoctorContext } from "../context/DoctorContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 
@@ -11,9 +12,10 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
     const { setAToken, backendUrl } = useContext(AdminContext);
-    const { setDToken } = useContext(DoctorContent);
+    const { setDToken } = useContext(DoctorContext);
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
@@ -93,6 +95,15 @@ const Login = () => {
                 <button className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition-colors">
                     Login
                 </button>
+
+                {state === "Doctor" && (
+                    <p
+                        onClick={() => navigate("/forgot-password")}
+                        className="text-center text-sm text-blue-500 cursor-pointer hover:underline"
+                    >
+                        Forgot Password?
+                    </p>
+                )}
 
                 {
                     state === "Admin"
