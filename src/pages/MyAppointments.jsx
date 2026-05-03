@@ -140,7 +140,7 @@ const MyAppointments = () => {
                     {appointments.map((item) => (
                         <div
                             key={item._id}
-                            className="grid grid-cols-[1fr_2fr] sm:flex sm:gap-6 gap-4 py-4 border-b items-center bg-white rounded-lg shadow-sm hover:shadow-md transition"
+                            className="flex flex-col sm:flex-row gap-4 py-4 border-b items-center bg-white rounded-lg shadow-sm hover:shadow-md transition p-4"
                         >
                             {/* Doctor Image */}
                             <div>
