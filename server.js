@@ -10,10 +10,9 @@ import doctorRouter from './routes/doctorRoute.js';
 import userRouter from './routes/userRoute.js';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
 // connect DB
-connectDB();
+export const databaseReady = connectDB();
 connectCloudinary();
 
 // allowed origins
@@ -74,11 +73,5 @@ app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
-
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
-}
 
 export default app;
