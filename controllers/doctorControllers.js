@@ -89,8 +89,28 @@ const getDoctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
     try {
         const { fees, address, available, about } = req.body;
-        const parsedAddress = typeof address === 'string' ? JSON.parse(address) : address;
-        await doctorModel.findByIdAndUpdate(req.docId, { fees, address: parsedAddress, available, about });
+
+        const feeAmount = Number(fees);
+        if (fees === '' || !Number.isFinite(feeAmount) || feeAmount < 0) {
+            return res.status(400).json({ success: false, message: "Enter a valid appointment fee" });
+        }
+
+        // DoctorModel stores address as a string. The profile form sends JSON
+        // text, so keep that string (or serialize an object) for MongoDB.
+        const addressValue = typeof address === 'string'
+            ? address
+            : JSON.stringify(address ?? {});
+
+        const doctor = await doctorModel.findByIdAndUpdate(
+            req.docId,
+            { fees: feeAmount, address: addressValue, available, about },
+            { new: true, runValidators: true }
+        );
+
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: "Doctor not found" });
+        }
+
         return res.status(200).json({ success: true, message: "Profile updated successfully" });
     } catch (error) {
         console.error("Update Doctor Profile Error:", error);
